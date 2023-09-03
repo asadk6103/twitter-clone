@@ -15,11 +15,12 @@ This repository contains a simple twiiter clone which has the features of
 
 
 ### Tech Stack Used In the Project
-- Backednd
+- Backend
     -   TypeScript, Node JS
-- Fronend
+- Frontend
     -   React JS, React Redux Toolkit
 - Database
     -   MySql
 
 ### Screenshots
+![Alt text](https://github.com/asadk6103/twitter-clone/blob/main/screenshots/screencapture-localhost-3000-2023-09-03-18_01_21.png?raw=true "Main page")
