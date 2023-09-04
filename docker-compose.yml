@@ -1,14 +1,12 @@
 version: '3.7'
 services:
   client:
-    build:
-      context: ./twitter-ui
-      dockerfile: Dockerfile
+    build: ${FRONTEND_DIR}
     image: twitter-ui
     container_name: twitter-ui
     command: npm start
     volumes:
-      - ${FRONTEND_DIR}:/app
+      - ${FRONTEND_DIR}/src:/app/src
     environment:
       - WDS_SOCKET_PORT=0
     depends_on:
@@ -19,17 +17,33 @@ services:
       - app-network
 
   server:
-    build:
-      context: ./twitter
-      dockerfile: Dockerfile
+    build: ${BACKEND_DIR}
     image: twitter-engine
     container_name: twitter-engine
     volumes:
-      - ${BACKEND_DIR}:/app
+      - ${BACKEND_DIR}/src:/app/src
+      - ${ROUTER_CONTROLLERS_DIR}:/app/src/controllers
+      - ${DB_MODELS_DIR}:/app/src/models
+      - ${UPLOAD_DIR}:/app/src/public
+      - ${ROUTER_MIDDLEWARES}:/app/src/middlewares/**/*.js
     ports:
       - "4001:4001"
     environment:
-      - NODE_ENV=development
+      - APP_NAME=${APP_NAME}
+      - APP_HOST=${APP_HOST}
+      - APP_PORT=${APP_PORT}
+      - APP_ROUTE_PREFIX=${APP_ROUTE_PREFIX}
+      - ROUTER_MIDDLEWARES=/app/src/middlewares/**/*.js
+      - NODE_ENV=${NODE_ENV}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASSWORD}
+      - DB_DIALECT=${DB_DIALECT}
+      - DB_PORT=${DB_PORT}
+      - DB_MODELS_DIR=/app/src/models
+      - ROUTER_CONTROLLERS_DIR=/app/src/controllers
+      - UPLOAD_DIR=/app/src/public
     networks:
       - app-network
 
@@ -37,17 +51,17 @@ services:
     container_name: twiiter-db
     image: mysql
     environment:
-        MYSQL_ROOT_PASSWORD: root123
-        MYSQL_DATABASE: twiiter_clone
-        MYSQL_USER: twiiter_clone
-        MYSQL_PASSWORD: Tw!tt3R@2023,.
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
         - "4002:3306"
     networks:
       - app-network
 
   phpmyadmin:
-    container_name: phpmyadminsst
+    container_name: phpmyadmin-twitter
     image: phpmyadmin
     environment:
         - PMA_ARBITRARY=1
@@ -55,7 +69,7 @@ services:
         - "4003:80"
     networks:
       - app-network
-      
+
 networks:
     app-network:
         driver: bridge
