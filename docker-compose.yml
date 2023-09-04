@@ -1,0 +1,66 @@
+version: '3.7'
+services:
+  client:
+    build:
+      context: ./twitter-ui
+      dockerfile: Dockerfile
+    image: twitter-ui
+    container_name: twitter-ui
+    command: npm start
+    volumes:
+      - ${FRONTEND_DIR}:/app
+    environment:
+      - WDS_SOCKET_PORT=0
+    depends_on:
+      - server
+    ports:
+      - "4000:3000"
+    networks:
+      - app-network
+
+  server:
+    build:
+      context: ./twitter
+      dockerfile: Dockerfile
+    image: twitter-engine
+    container_name: twitter-engine
+    volumes:
+      - ${BACKEND_DIR}:/app
+    ports:
+      - "4001:4001"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - app-network
+
+  mysql_db:
+    container_name: twiiter-db
+    image: mysql
+    environment:
+        MYSQL_ROOT_PASSWORD: root123
+        MYSQL_DATABASE: twiiter_clone
+        MYSQL_USER: twiiter_clone
+        MYSQL_PASSWORD: Tw!tt3R@2023,.
+    ports:
+        - "4002:3306"
+    networks:
+      - app-network
+
+  phpmyadmin:
+    container_name: phpmyadminsst
+    image: phpmyadmin
+    environment:
+        - PMA_ARBITRARY=1
+    ports:
+        - "4003:80"
+    networks:
+      - app-network
+      
+networks:
+    app-network:
+        driver: bridge
+volumes:
+    data-volume:
+    node_modules:
+    web-root:
+      driver: local
